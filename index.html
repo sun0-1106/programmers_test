@@ -1,0 +1,71 @@
+<html>
+  <head>
+    <title>2022 FE 데브매칭</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <main class="App">
+      <div class="SelectedLanguage">
+        <ul>
+          <li>JavaScript</li>
+          <li>Python</li>
+          <li>Elixir</li>
+          <li>Java</li>
+          <li>PHP</li>
+        </ul>
+      </div>
+      <form class="SearchInput">
+        <input
+          class="SearchInput__input"
+          type="text"
+          placeholder="프로그램 언어를 입력하세요."
+          onkeydown="getInfo()"
+        />
+      </form>
+      <div class="Suggestion">
+        <!-- <ul>
+          <li class="Suggestion__item--selected">Action<span class="Suggestion__item--matched">Script</span></li>
+          <li>Java<span class="Suggestion__item--matched">Script</span></li>
+        </ul> -->
+      </div>
+    </main>
+    <script>
+      function getInfo() {
+        let str = event.target.value;
+        const config = {
+          method: 'get',
+        };
+        fetch(
+          `https://wr4a6p937i.execute-api.ap-northeast-2.amazonaws.com/dev/languages?keyword=${event.target.value}`,
+          config,
+        )
+          .then(response => response.json())
+          .then(data => {
+            //onClickEvent가 생길때마다 초반에 Suggestion하단 태그들을 지워준다.
+            let suggestion = document.getElementsByClassName('Suggestion');
+            while (suggestion[0].firstChild) {
+              suggestion[0].removeChild(suggestion[0].firstChild);
+            }
+            let ul = document.createElement('ul');
+            //데이터가 들어왔다면
+            if (Array.isArray(data)) {
+              for (let el of data) {
+                let li = document.createElement('li');
+                let span = document.createElement('span');
+                span.classList.add('Suggestion__item--matched');
+                span.textContent = str;
+                li.textContent = el.replace(str, '');
+                li.appendChild(span);
+                suggestion[0].appendChild(ul);
+                ul.appendChild(li);
+                if (el === data[0]) {
+                  li.classList.add('Suggestion__item--selected');
+                }
+              }
+            }
+          })
+          .catch(error => console.log(error));
+      }
+    </script>
+  </body>
+</html>
